@@ -1,10 +1,6 @@
-# 1. OpenAI Kütüphanesini Kurulumu
-!pip install openai
-!pip install ipywidgets
 
 import os
 import openai
-from google.colab import userdata
 import ipywidgets as widgets
 from IPython.display import display, clear_output
 
