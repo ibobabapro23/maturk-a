@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maturka AI - Çalışan Versiyon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d0d12;
+            --sidebar-bg: #09090d;
+            --accent-purple: #7b2ff7;
+            --accent-pink: #f107a3;
+            --accent-blue: #00f2ff;
+            --text-main: #ffffff;
+            --text-dim: #8e8ea0;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; }
+
+        /* SIDEBAR */
+        .sidebar { width: 280px; background-color: var(--sidebar-bg); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; padding: 20px; z-index: 10; }
+        .new-chat-btn { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); border: none; color: white; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-bottom: 30px; transition: 0.3s; }
+        .new-chat-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .history-section { flex-grow: 1; text-align: center; color: var(--text-dim); font-size: 0.9rem; padding-top: 20px; }
+        .sidebar-footer { display: flex; flex-direction: column; gap: 12px; }
+        .version-tag { background: var(--glass); border: 1px solid var(--glass-border); padding: 10px; border-radius: 20px; font-size: 12px; text-align: center; }
+        .author-box { background: rgba(123, 47, 247, 0.1); border: 1px solid rgba(123, 47, 247, 0.2); padding: 15px; border-radius: 12px; font-size: 12px; text-align: center; }
+
+        /* ANA KONTEYNER */
+        .main-container { flex-grow: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at 50% -20%, #1a1a2e 0%, #0d0d12 60%); }
+        
+        header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
+        .logo span { background: linear-gradient(to right, var(--accent-pink), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.5rem; }
+
+        /* SOHBET AKIŞI (YENİ) */
+        #chat-flow {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px 10%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+            z-index: 2;
+        }
+
+        /* Mesaj Balonları */
+        .message { max-width: 80%; padding: 12px 18px; border-radius: 15px; font-size: 0.95rem; line-height: 1.5; animation: fadeIn 0.3s ease; }
+        .user-msg { align-self: flex-end; background: var(--accent-purple); color: white; border-bottom-right-radius: 2px; }
+        .ai-msg { align-self: flex-start; background: var(--glass); border: 1px solid var(--glass-border); border-bottom-left-radius: 2px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* KARŞILAMA EKRANI (Mesaj yokken görünür) */
+        #welcome-screen {
+            position: absolute;
+            top: 45%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+            transition: opacity 0.3s;
+        }
+
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 500px; margin-top: 30px; }
+        .feature-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .feature-card:hover { background: rgba(255,255,255,0.08); }
+
+        /* INPUT ALANI */
+        .input-wrapper { padding: 20px 10%; background: linear-gradient(transparent, var(--bg-dark)); z-index: 10; }
+        .input-bar { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 18px; display: flex; padding: 10px 20px; backdrop-filter: blur(20px); }
+        .input-bar input { flex-grow: 1; background: transparent; border: none; color: white; font-size: 1rem; outline: none; padding: 10px; }
+        .send-btn { background: var(--accent-purple); border: none; color: white; width: 45px; height: 45px; border-radius: 12px; cursor: pointer; margin-left: 10px; }
+        .warning { font-size: 11px; color: #555; text-align: center; margin-top: 10px; }
+
+        /* Custom Scrollbar */
+        #chat-flow::-webkit-scrollbar { width: 6px; }
+        #chat-flow::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <button class="new-chat-btn" onclick="location.reload()">+ Yeni Sohbet</button>
+        <div class="history-section">Sohbet Geçmişi</div>
+        <div class="sidebar-footer">
+            <div class="version-tag">Maturka V 4.2</div>
+            <div class="author-box">Yapımcı: <strong>Hasan Günbeyi</strong></div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        <header>
+            <div class="logo"><span>MATURKA</span></div>
+            <div style="color: var(--accent-blue)">ONLINE</div>
+        </header>
+
+        <div id="chat-flow">
+            <div id="welcome-screen">
+                <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Merhaba, Ben <span style="color:var(--accent-purple)">MATURKA</span></h1>
+                <p style="color: var(--text-dim)">Matematik ağırlıklı yapay zeka asistanınız.</p>
+                <div class="features-grid">
+                    <div class="feature-card" onclick="fillInput('İntegral nasıl hesaplanır?')">📐 İntegral hesaplama</div>
+                    <div class="feature-card" onclick="fillInput('Türev kurallarını anlat')">📈 Türev kuralları</div>
+                    <div class="feature-card" onclick="fillInput('Limit soruları çöz')">∞ Limit hesaplama</div>
+                    <div class="feature-card" onclick="fillInput('Denklem çözümü yap')">🔢 Denklem çözümü</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-wrapper">
+            <div class="input-bar">
+                <input type="text" id="user-input" placeholder="Bir soru sorun..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+            <p class="warning">MATURKA hata yapabilir. Lütfen sonuçları kontrol edin.</p>
+        </div>
+    </main>
+
+    <script>
+        const chatFlow = document.getElementById('chat-flow');
+        const userInput = document.getElementById('user-input');
+        const welcomeScreen = document.getElementById('welcome-screen');
+
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (text === "") return;
+
+            // Karşılama ekranını gizle
+            welcomeScreen.style.opacity = "0";
+            setTimeout(() => welcomeScreen.style.display = "none", 300);
+
+            // Kullanıcı mesajını ekle
+            addMessage(text, 'user-msg');
+            userInput.value = "";
+
+            // Yapay zeka cevabı simülasyonu (Buraya gerçek API bağlanabilir)
+            setTimeout(() => {
+                addMessage("Şu an geliştirme aşamasındayım ancak '" + text + "' sorunu aldım. Matematiksel işlemleri Hasan Günbeyi'nin yönergeleriyle yakında çözebileceğim!", 'ai-msg');
+            }, 800);
+        }
+
+        function addMessage(text, className) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            msgDiv.innerText = text;
+            chatFlow.appendChild(msgDiv);
+            
+            // Otomatik aşağı kaydır
+            chatFlow.scrollTop = chatFlow.scrollHeight;
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function fillInput(val) {
+            userInput.value = val;
+            userInput.focus();
+        }
+    </script>
+</body>
+</html>
